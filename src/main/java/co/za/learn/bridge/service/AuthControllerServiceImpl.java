@@ -1,0 +1,131 @@
+package co.za.learn.bridge.service;
+
+import co.za.learn.bridge.model.dto.ERole;
+import co.za.learn.bridge.model.entity.Role;
+import co.za.learn.bridge.model.entity.User;
+import co.za.learn.bridge.model.payload.request.LoginRequest;
+import co.za.learn.bridge.model.payload.request.SignupRequest;
+import co.za.learn.bridge.model.payload.response.MessageResponse;
+import co.za.learn.bridge.model.payload.response.UserInfoResponse;
+import co.za.learn.bridge.repository.RoleRepository;
+import co.za.learn.bridge.repository.UserRepository;
+import co.za.learn.bridge.security.jwt.JwtUtils;
+import co.za.learn.bridge.security.services.UserDetailsImpl;
+import co.za.learn.bridge.utils.exception.LearnBridgeException;
+import java.util.*;
+import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+@AllArgsConstructor
+public class AuthControllerServiceImpl implements AuthControllerService {
+  private static final Logger logger = LogManager.getLogger(AuthControllerServiceImpl.class);
+  AuthenticationManager authenticationManager;
+  UserRepository userRepository;
+  RoleRepository roleRepository;
+  PasswordEncoder encoder;
+  JwtUtils jwtUtils;
+
+  @Override
+  public ResponseEntity<Object> authenticateUser(LoginRequest loginRequest)
+      throws LearnBridgeException {
+    try {
+      Authentication authentication =
+          authenticationManager.authenticate(
+              new UsernamePasswordAuthenticationToken(
+                  loginRequest.getUsername(), loginRequest.getPassword()));
+
+      SecurityContextHolder.getContext().setAuthentication(authentication);
+
+      UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+      ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+
+      List<String> roles =
+          userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
+
+      UserInfoResponse response =
+          UserInfoResponse.builder()
+              .id(userDetails.getId())
+              .name(userDetails.getName())
+              .surname(userDetails.getSurname())
+              .phoneNumber(userDetails.getPhoneNumber())
+              .createdDate(userDetails.getCreatedDate())
+              .email(userDetails.getEmail())
+              .roles(roles)
+              .roleFriendlyNames(getRoleFriendlyNames(roles))
+              .province(userDetails.getProvince())
+              .grade(userDetails.getGrade())
+              .interests(userDetails.getInterests())
+              .subjects(userDetails.getSubjects())
+              .financialBackground(userDetails.getFinancialBackground())
+              .build();
+
+      return ResponseEntity.ok()
+          .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+          .body(response);
+
+    } catch (Exception e) {
+      logger.error("Authentication failed: ", e);
+      throw new LearnBridgeException(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public ResponseEntity<Object> signup(SignupRequest request) throws LearnBridgeException {
+    try {
+      Optional<User> userByEmail = userRepository.findByEmail(request.getEmail());
+      if (userByEmail.isPresent()) {
+        return ResponseEntity.badRequest()
+            .body(new MessageResponse(false, "Error: Email is already in use!"));
+      }
+
+      Set<Role> roles = new HashSet<>();
+
+      Role userRole =
+          roleRepository
+              .findByName(ERole.ROLE_USER)
+              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+
+      roles.add(userRole);
+
+      User user =
+          User.builder()
+              .name(request.getName())
+              .surname(request.getSurname())
+              .phoneNumber(request.getPhoneNumber())
+              .email(request.getEmail())
+              .password(encoder.encode(request.getPassword()))
+              .province(request.getProvince())
+              .interests(request.getInterests())
+              .subjects(request.getSubjects())
+              .financialBackground(request.getFinancialBackground())
+              .createdDate(new Date())
+              .roles(roles)
+              .build();
+
+      userRepository.save(user);
+
+      return ResponseEntity.ok(new MessageResponse(true, "Profile created successfully!"));
+
+    } catch (Exception e) {
+      logger.error("Unable to register user: ", e);
+      throw new LearnBridgeException(e.getMessage(), e);
+    }
+  }
+
+  public static List<String> getRoleFriendlyNames(List<String> roleNames) {
+    return roleNames.stream().map(name -> ERole.valueOf(name).getValue()).toList();
+  }
+}

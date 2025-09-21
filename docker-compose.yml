@@ -1,0 +1,29 @@
+version: '3.7'
+services:
+  mongodb:
+    image: mongo:4.4
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: Venus@18
+    ports:
+      - 27018:27017
+    volumes:
+      - mongo_bridge_data:/data/db
+
+  learn-bridge-app:
+    image: 212171077/learn-bridge:latest
+    depends_on:
+      - mongodb
+    environment:
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_DATABASE: learn-bridge-db
+      SPRING_DATA_MONGODB_USERNAME: admin
+      SPRING_DATA_MONGODB_PASSWORD: Venus@18
+      SERVER_PORT: 8091
+    ports:
+      - 8091:8091
+
+volumes:
+  mongo_bridge_data:
+    driver: local
