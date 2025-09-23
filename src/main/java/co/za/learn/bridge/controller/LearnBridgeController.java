@@ -1,6 +1,7 @@
 package co.za.learn.bridge.controller;
 
 import co.za.learn.bridge.model.payload.request.UpdateLoginDetailsRequest;
+import co.za.learn.bridge.model.payload.request.UpdateProfileSetupRequest;
 import co.za.learn.bridge.model.payload.request.UpdateUserRequest;
 import co.za.learn.bridge.service.LearnBridgeService;
 import jakarta.validation.Valid;
@@ -23,14 +24,26 @@ public class LearnBridgeController {
   @PostMapping("/update-user")
   @PreAuthorize("hasRole('USER')")
   public ResponseEntity<Object> updateUser(@Valid @RequestBody UpdateUserRequest request) {
-    logger.info("Update user, FarmID: {}, Name: {}", request.getFarmId(), request.getName());
     return learnBridgeService.updateUser(request);
   }
 
+  @PostMapping("/update-profile-setup")
+  @PreAuthorize("hasRole('USER')")
+  public ResponseEntity<Object> updateProfileSetup(@Valid @RequestBody UpdateProfileSetupRequest request) {
+    return learnBridgeService.updateProfileSetup(request);
+  }
+
   @PostMapping("/update-login-details")
-  @PreAuthorize("hasRole('USER') or hasRole('FARM_MANAGER') or hasRole('FARM_WORKER')")
+  @PreAuthorize("hasRole('USER')")
   ResponseEntity<Object> updateLoginDetails(@Valid @RequestBody UpdateLoginDetailsRequest request) {
     logger.info("Update login details: User ID: {}", request.getUserId());
     return learnBridgeService.updateLoginDetails(request);
+  }
+
+  @GetMapping("find-user-by-id/{userId}")
+  @PreAuthorize("hasRole('USER')")
+  ResponseEntity<Object> findUserById(@PathVariable String userId) {
+    logger.info("Find user by Id, FarmId: {}", userId);
+    return learnBridgeService.findUserById(userId);
   }
 }

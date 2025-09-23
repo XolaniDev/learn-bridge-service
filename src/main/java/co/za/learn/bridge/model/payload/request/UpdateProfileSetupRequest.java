@@ -3,36 +3,31 @@ package co.za.learn.bridge.model.payload.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SignupRequest {
+public class UpdateProfileSetupRequest {
 
   @NotBlank
-  @Size(min = 2, max = 50)
-  private String name;
+  private String userId;
 
   @NotBlank
-  @Size(min = 2, max = 50)
-  private String surname;
-
-  @NotBlank
-  @Email
   @Size(max = 50)
-  private String email;
+  private String province;
 
   @NotBlank
-  @Size(max = 15)
-  private String phoneNumber;
+  @Size(max = 50)
+  private String grade;
 
-  @NotBlank
-  @Size(min = 6, max = 120)
-  private String password;
+  private List<String> interests;
+
+  private List<String> subjects;
+
+  private String financialBackground;
 
 }

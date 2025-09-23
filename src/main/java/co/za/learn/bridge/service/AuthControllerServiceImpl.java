@@ -4,8 +4,10 @@ import co.za.learn.bridge.model.dto.ERole;
 import co.za.learn.bridge.model.entity.Role;
 import co.za.learn.bridge.model.entity.User;
 import co.za.learn.bridge.model.payload.request.LoginRequest;
+import co.za.learn.bridge.model.payload.request.ProfileSetupRequest;
 import co.za.learn.bridge.model.payload.request.SignupRequest;
 import co.za.learn.bridge.model.payload.response.MessageResponse;
+import co.za.learn.bridge.model.payload.response.SignupResponse;
 import co.za.learn.bridge.model.payload.response.UserInfoResponse;
 import co.za.learn.bridge.repository.RoleRepository;
 import co.za.learn.bridge.repository.UserRepository;
@@ -88,7 +90,7 @@ public class AuthControllerServiceImpl implements AuthControllerService {
       Optional<User> userByEmail = userRepository.findByEmail(request.getEmail());
       if (userByEmail.isPresent()) {
         return ResponseEntity.badRequest()
-            .body(new MessageResponse(false, "Error: Email is already in use!"));
+            .body(new SignupResponse(false, "Error: Email is already in use!", null));
       }
 
       Set<Role> roles = new HashSet<>();
@@ -107,20 +109,44 @@ public class AuthControllerServiceImpl implements AuthControllerService {
               .phoneNumber(request.getPhoneNumber())
               .email(request.getEmail())
               .password(encoder.encode(request.getPassword()))
-              .province(request.getProvince())
-              .interests(request.getInterests())
-              .subjects(request.getSubjects())
-              .financialBackground(request.getFinancialBackground())
               .createdDate(new Date())
               .roles(roles)
               .build();
 
-      userRepository.save(user);
+      User savedUser = userRepository.save(user);
 
-      return ResponseEntity.ok(new MessageResponse(true, "Profile created successfully!"));
+      return ResponseEntity.ok(
+          new SignupResponse(true, "Profile created successfully!", savedUser.getId()));
 
     } catch (Exception e) {
       logger.error("Unable to register user: ", e);
+      throw new LearnBridgeException(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public ResponseEntity<Object> profileSetup(ProfileSetupRequest request)
+      throws LearnBridgeException {
+    try {
+
+      Optional<User> userOptional = userRepository.findById(request.getUserId());
+
+      if (userOptional.isPresent()) {
+        User user = userOptional.get();
+        user.setInterests(request.getInterests());
+        user.setProvince(request.getProvince());
+        user.setGrade(request.getGrade());
+        user.setSubjects(request.getSubjects());
+        user.setFinancialBackground(request.getFinancialBackground());
+        userRepository.save(user);
+      } else {
+        throw new LearnBridgeException("User not found");
+      }
+
+      return ResponseEntity.ok(new MessageResponse(true, "Profile setup successfully!"));
+
+    } catch (Exception e) {
+      logger.error("Unable to setup user profile: ", e);
       throw new LearnBridgeException(e.getMessage(), e);
     }
   }

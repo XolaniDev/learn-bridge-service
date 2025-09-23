@@ -1,6 +1,7 @@
 package co.za.learn.bridge.controller;
 
 import co.za.learn.bridge.model.payload.request.LoginRequest;
+import co.za.learn.bridge.model.payload.request.ProfileSetupRequest;
 import co.za.learn.bridge.model.payload.request.SignupRequest;
 import co.za.learn.bridge.service.AuthControllerService;
 import co.za.learn.bridge.utils.exception.LearnBridgeException;
@@ -31,16 +32,34 @@ public class AuthController {
   public ResponseEntity<Object> signup(@Valid @RequestBody SignupRequest request)
       throws LearnBridgeException {
     logger.info(
-        "Registering user: [Name: {}, Surname: {}, Email: {}, Phone Number: {}, Province: {}, Grade: {},  interests: {}, subjects: {}, financialBackground: {}   ]",
+        "Registering user: [Name: {}, Surname: {}, Email: {}, Phone Number: {}]",
         request.getName(),
         request.getSurname(),
         request.getEmail(),
-        request.getPhoneNumber(),
-        request.getProvince(),
-        request.getGrade(),
-        request.getInterests(),
-        request.getSubjects(),
-        request.getFinancialBackground());
+        request.getPhoneNumber());
     return authControllerService.signup(request);
   }
+
+  @PostMapping("/profile-setup")
+  public ResponseEntity<Object> profileSetup(@Valid @RequestBody ProfileSetupRequest request)
+          throws LearnBridgeException {
+    logger.info(
+            "Registering user: [Province: {}, Grade: {},  interests: {}, subjects: {}, financialBackground: {}   ]",
+            request.getProvince(),
+            request.getGrade(),
+            request.getInterests(),
+            request.getSubjects(),
+            request.getFinancialBackground());
+    return authControllerService.profileSetup(request);
+  }
+
+/*  UserProfile({
+    this.grade,
+            List<String>? subjects,
+            List<String>? interests,
+            this.financialBackground,
+            this.province,
+  })  : subjects = subjects ?? [],
+  interests = interests ?? [];
+}*/
 }

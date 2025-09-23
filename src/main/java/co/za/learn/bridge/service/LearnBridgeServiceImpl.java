@@ -6,6 +6,7 @@ import co.za.learn.bridge.model.entity.Role;
 import co.za.learn.bridge.model.entity.User;
 import co.za.learn.bridge.model.payload.request.LoginRequest;
 import co.za.learn.bridge.model.payload.request.UpdateLoginDetailsRequest;
+import co.za.learn.bridge.model.payload.request.UpdateProfileSetupRequest;
 import co.za.learn.bridge.model.payload.request.UpdateUserRequest;
 import co.za.learn.bridge.model.payload.response.MessageResponse;
 import co.za.learn.bridge.model.payload.response.UserInfoResponse;
@@ -43,6 +44,44 @@ public class LearnBridgeServiceImpl implements LearnBridgeService {
               .surname(user.getSurname())
               .email(user.getEmail())
               .phoneNumber(user.getPhoneNumber())
+              .province(user.getProvince())
+              .grade(user.getGrade())
+              .interests(user.getInterests())
+              .subjects(user.getSubjects())
+              .financialBackground(user.getFinancialBackground())
+              .createdDate(user.getCreatedDate())
+              .roles(user.getRoles().stream().map(Role::getName).map(Enum::name).toList())
+              .roleFriendlyNames(
+                  user.getRoles().stream().map(Role::getName).map(ERole::getValue).toList())
+              .build();
+      logger.info("User update successful");
+      return ResponseEntity.ok(userInfoResponse);
+    } catch (LearnBridgeException e) {
+      logger.error("Update user Error: ", e);
+      return ResponseEntity.badRequest().body(new MessageResponse(false, e.getMessage()));
+    }
+  }
+
+  @Override
+  public ResponseEntity<Object> updateProfileSetup(UpdateProfileSetupRequest request) {
+
+    Optional<User> optionalUser = getUserOptional(request.getUserId());
+    if (optionalUser.isPresent()) {
+      User user = optionalUser.get();
+      user.setInterests(request.getInterests());
+      user.setProvince(request.getProvince());
+      user.setGrade(request.getGrade());
+      user.setSubjects(request.getSubjects());
+      user.setFinancialBackground(request.getFinancialBackground());
+      userRepository.save(user);
+
+      UserInfoResponse userInfoResponse =
+          UserInfoResponse.builder()
+              .id(user.getId())
+              .name(user.getName())
+              .surname(user.getSurname())
+              .email(user.getEmail())
+              .phoneNumber(user.getPhoneNumber())
               .province(request.getProvince())
               .grade(request.getGrade())
               .interests(request.getInterests())
@@ -55,9 +94,8 @@ public class LearnBridgeServiceImpl implements LearnBridgeService {
               .build();
       logger.info("User update successful");
       return ResponseEntity.ok(userInfoResponse);
-    } catch (LearnBridgeException e) {
-      logger.error("Update user Error: ", e);
-      return ResponseEntity.badRequest().body(new MessageResponse(false, e.getMessage()));
+    } else {
+      return ResponseEntity.badRequest().body(new MessageResponse(false, "User not found"));
     }
   }
 
@@ -104,19 +142,46 @@ public class LearnBridgeServiceImpl implements LearnBridgeService {
     }
   }
 
+  @Override
+  public ResponseEntity<Object> findUserById(String userId) {
+
+    Optional<User> optionalUser = getUserOptional(userId);
+    User user;
+    if (optionalUser.isPresent()) {
+      user = optionalUser.get();
+
+      UserInfoResponse userInfoResponse =
+          UserInfoResponse.builder()
+              .id(user.getId())
+              .name(user.getName())
+              .surname(user.getSurname())
+              .email(user.getEmail())
+              .phoneNumber(user.getPhoneNumber())
+              .province(user.getProvince())
+              .grade(user.getGrade())
+              .interests(user.getInterests())
+              .subjects(user.getSubjects())
+              .financialBackground(user.getFinancialBackground())
+              .createdDate(user.getCreatedDate())
+              .roles(user.getRoles().stream().map(Role::getName).map(Enum::name).toList())
+              .roleFriendlyNames(
+                  user.getRoles().stream().map(Role::getName).map(ERole::getValue).toList())
+              .build();
+      return ResponseEntity.ok(userInfoResponse);
+    } else {
+      logger.info("Invalid user ID: {}", userId);
+      return ResponseEntity.badRequest().body(new MessageResponse(false, "Invalid user ID"));
+    }
+  }
+
   private User getUser(UpdateUserRequest request) throws LearnBridgeException {
-    Optional<User> optionalUser = getUserOptional(request.getId());
+    Optional<User> optionalUser = getUserOptional(request.getUserId());
     User user;
     if (optionalUser.isPresent()) {
       user = optionalUser.get();
       user.setName(request.getName());
       user.setSurname(request.getSurname());
       user.setEmail(request.getEmail());
-      user.setProvince(request.getProvince());
-      user.setGrade(request.getGrade());
-      user.setInterests(request.getInterests());
-      user.setSubjects(request.getSubjects());
-      user.setFinancialBackground(request.getFinancialBackground());
       user.setPhoneNumber(request.getPhoneNumber());
     } else {
       user = new User();
@@ -124,11 +189,6 @@ public class LearnBridgeServiceImpl implements LearnBridgeService {
       user.setSurname(request.getSurname());
       user.setEmail(request.getEmail());
       user.setPhoneNumber(request.getPhoneNumber());
-      user.setProvince(request.getProvince());
-      user.setGrade(request.getGrade());
-      user.setInterests(request.getInterests());
-      user.setSubjects(request.getSubjects());
-      user.setFinancialBackground(request.getFinancialBackground());
       user.setPassword(encoder.encode(LearnBridgeUtil.generatePassword()));
     }
     return user;

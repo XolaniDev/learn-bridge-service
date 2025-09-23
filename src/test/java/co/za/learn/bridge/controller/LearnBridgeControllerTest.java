@@ -63,7 +63,7 @@ class LearnBridgeControllerTest extends ContainerBase {
     assertNotNull(userInfoResponse);
 
     UpdateUserRequest updateRequest = new UpdateUserRequest();
-    updateRequest.setId(userInfoResponse.getId());
+    updateRequest.setUserId(userInfoResponse.getId());
     updateRequest.setName("UpdatedName");
     updateRequest.setSurname("UpdatedSurname");
     updateRequest.setEmail("UpdatedEmail");
@@ -108,8 +108,6 @@ class LearnBridgeControllerTest extends ContainerBase {
   void testUpdateUserWithInvalidFarmIDRequest() {
 
     UpdateUserRequest updateRequest = new UpdateUserRequest();
-
-    updateRequest.setFarmId("InvalidFarmID");
     updateRequest.setName("InvFarmIdNewName");
     updateRequest.setSurname("InvFarmIdNewSurname");
     updateRequest.setEmail("InvFarmIdNewEmail");
