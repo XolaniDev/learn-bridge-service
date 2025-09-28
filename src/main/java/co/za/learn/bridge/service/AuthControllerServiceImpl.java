@@ -1,11 +1,13 @@
 package co.za.learn.bridge.service;
 
+import co.za.learn.bridge.excption.NotFoundException;
 import co.za.learn.bridge.model.dto.ERole;
 import co.za.learn.bridge.model.entity.Role;
 import co.za.learn.bridge.model.entity.User;
 import co.za.learn.bridge.model.payload.request.LoginRequest;
 import co.za.learn.bridge.model.payload.request.ProfileSetupRequest;
 import co.za.learn.bridge.model.payload.request.SignupRequest;
+import co.za.learn.bridge.model.payload.response.ForgotPasswordRequest;
 import co.za.learn.bridge.model.payload.response.MessageResponse;
 import co.za.learn.bridge.model.payload.response.SignupResponse;
 import co.za.learn.bridge.model.payload.response.UserInfoResponse;
@@ -13,6 +15,8 @@ import co.za.learn.bridge.repository.RoleRepository;
 import co.za.learn.bridge.repository.UserRepository;
 import co.za.learn.bridge.security.jwt.JwtUtils;
 import co.za.learn.bridge.security.services.UserDetailsImpl;
+import co.za.learn.bridge.utils.ConstantUtil;
+import co.za.learn.bridge.utils.LearnBridgeUtil;
 import co.za.learn.bridge.utils.exception.LearnBridgeException;
 import java.util.*;
 import lombok.AllArgsConstructor;
@@ -38,6 +42,7 @@ public class AuthControllerServiceImpl implements AuthControllerService {
   RoleRepository roleRepository;
   PasswordEncoder encoder;
   JwtUtils jwtUtils;
+  AsyncService asyncService;
 
   @Override
   public ResponseEntity<Object> authenticateUser(LoginRequest loginRequest)
@@ -71,6 +76,7 @@ public class AuthControllerServiceImpl implements AuthControllerService {
               .grade(userDetails.getGrade())
               .interests(userDetails.getInterests())
               .subjects(userDetails.getSubjects())
+              .changePassword(userDetails.isChangePassword())
               .financialBackground(userDetails.getFinancialBackground())
               .build();
 
@@ -109,12 +115,18 @@ public class AuthControllerServiceImpl implements AuthControllerService {
               .phoneNumber(request.getPhoneNumber())
               .email(request.getEmail())
               .password(encoder.encode(request.getPassword()))
+              .learnerNumber(
+                  LearnBridgeUtil.generateLearnerNumber(
+                      request.getName(),
+                      request.getSurname(),
+                      request.getPhoneNumber(),
+                      new Date()))
               .createdDate(new Date())
               .roles(roles)
               .build();
 
       User savedUser = userRepository.save(user);
-
+      asyncService.registrationNotification(savedUser, request.getPassword());
       return ResponseEntity.ok(
           new SignupResponse(true, "Profile created successfully!", savedUser.getId()));
 
@@ -148,6 +160,35 @@ public class AuthControllerServiceImpl implements AuthControllerService {
     } catch (Exception e) {
       logger.error("Unable to setup user profile: ", e);
       throw new LearnBridgeException(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public ResponseEntity<Object> forgotPassword(ForgotPasswordRequest request) {
+    try {
+      String mssg =
+          "Your password has been successfully reset. "
+              + "An email has been sent to the registered email address "
+              + "associated with your account containing the new login details. "
+              + "Please check your email inbox.";
+
+      Optional<User> userOptional =
+          userRepository.findByEmailAndLearnerNumber(
+              request.getEmail(), request.getLearnerNumber());
+      if (userOptional.isEmpty()) {
+        throw new NotFoundException(
+            "User is not registered. Please contact us to register or check your credentials.");
+      } else {
+        asyncService.notifyUserNewPassword(userOptional.get());
+      }
+
+      return ResponseEntity.ok(ResponseEntity.ok(new MessageResponse(true, mssg)));
+    } catch (NotFoundException e) {
+      logger.error("Error: ", e);
+      return ResponseEntity.badRequest().body(new MessageResponse(false, e.getMessage()));
+    } catch (Exception e) {
+      logger.error("Error: ", e);
+      return ResponseEntity.ok(new MessageResponse(false, ConstantUtil.SERVICE_UNAVAILABLE_MSSG));
     }
   }
 

@@ -1,10 +1,9 @@
 package co.za.learn.bridge.model.entity;
 
 
-import java.util.Date;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.util.Date;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

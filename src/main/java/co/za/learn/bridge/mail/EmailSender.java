@@ -1,17 +1,16 @@
 package co.za.learn.bridge.mail;
 
+import co.za.learn.bridge.model.entity.EmailContent;
+import co.za.learn.bridge.model.entity.EmailLog;
+import co.za.learn.bridge.service.EmailContentService;
+import co.za.learn.bridge.service.MailLogService;
+import jakarta.mail.internet.MimeMessage;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-
-import co.za.learn.bridge.model.entity.EmailContent;
-import co.za.learn.bridge.model.entity.EmailLog;
-import co.za.learn.bridge.service.EmailContentService;
-import co.za.learn.bridge.service.MailLogService;
-import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

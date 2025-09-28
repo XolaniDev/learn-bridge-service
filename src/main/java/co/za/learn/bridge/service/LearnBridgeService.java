@@ -10,4 +10,7 @@ public interface LearnBridgeService {
   ResponseEntity<Object> updateProfileSetup(UpdateProfileSetupRequest request);
   ResponseEntity<Object> updateLoginDetails(UpdateLoginDetailsRequest request);
   ResponseEntity<Object> findUserById(String userId);
+  ResponseEntity<Object> getDashboardData(String userId);
+  ResponseEntity<Object> getFundingData(String userId);
+  ResponseEntity<Object> getJobMarket(String userId);
 }

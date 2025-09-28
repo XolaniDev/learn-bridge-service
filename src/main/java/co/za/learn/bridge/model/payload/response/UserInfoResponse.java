@@ -2,10 +2,6 @@ package co.za.learn.bridge.model.payload.response;
 
 import java.util.Date;
 import java.util.List;
-
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,5 +24,7 @@ public class UserInfoResponse {
   private String financialBackground;
   private List<String> roles;
   private List<String> roleFriendlyNames;
+  private String learnerNumber;
+  private boolean changePassword;
 
 }

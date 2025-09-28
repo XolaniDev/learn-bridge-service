@@ -1,8 +1,7 @@
 package co.za.learn.bridge.mail;
 
-import java.util.List;
-
 import co.za.learn.bridge.model.dto.Attachment;
+import java.util.List;
 import lombok.Data;
 
 @Data

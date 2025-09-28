@@ -3,6 +3,7 @@ package co.za.learn.bridge.controller;
 import co.za.learn.bridge.model.payload.request.LoginRequest;
 import co.za.learn.bridge.model.payload.request.ProfileSetupRequest;
 import co.za.learn.bridge.model.payload.request.SignupRequest;
+import co.za.learn.bridge.model.payload.response.ForgotPasswordRequest;
 import co.za.learn.bridge.service.AuthControllerService;
 import co.za.learn.bridge.utils.exception.LearnBridgeException;
 import jakarta.validation.Valid;
@@ -53,13 +54,9 @@ public class AuthController {
     return authControllerService.profileSetup(request);
   }
 
-/*  UserProfile({
-    this.grade,
-            List<String>? subjects,
-            List<String>? interests,
-            this.financialBackground,
-            this.province,
-  })  : subjects = subjects ?? [],
-  interests = interests ?? [];
-}*/
+  @PostMapping("/forgot-password")
+  public ResponseEntity<Object> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+    return authControllerService.forgotPassword(request);
+  }
+
 }

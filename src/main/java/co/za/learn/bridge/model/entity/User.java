@@ -43,6 +43,8 @@ public class User {
     private List<String> subjects;
     private String financialBackground;
     private String province;
+    private String learnerNumber;
+    private boolean changePassword;
 
     @DBRef
     private Set<Role> roles = new HashSet<>();

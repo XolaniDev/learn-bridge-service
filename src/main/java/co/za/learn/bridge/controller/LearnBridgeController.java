@@ -36,14 +36,36 @@ public class LearnBridgeController {
   @PostMapping("/update-login-details")
   @PreAuthorize("hasRole('USER')")
   ResponseEntity<Object> updateLoginDetails(@Valid @RequestBody UpdateLoginDetailsRequest request) {
-    logger.info("Update login details: User ID: {}", request.getUserId());
+    logger.info("Update login details: userId: {}", request.getUserId());
     return learnBridgeService.updateLoginDetails(request);
   }
 
   @GetMapping("find-user-by-id/{userId}")
   @PreAuthorize("hasRole('USER')")
   ResponseEntity<Object> findUserById(@PathVariable String userId) {
-    logger.info("Find user by Id, FarmId: {}", userId);
+    logger.info("Find user by Id, userId: {}", userId);
     return learnBridgeService.findUserById(userId);
   }
+
+  @GetMapping("dashboard/{userId}")
+  @PreAuthorize("hasRole('USER')")
+  ResponseEntity<Object> getDashboardData(@PathVariable String userId) {
+    logger.info("Get Dashboard Data by  user Id, userId: {}", userId);
+    return learnBridgeService.getDashboardData(userId);
+  }
+
+  @GetMapping("funding/{userId}")
+  @PreAuthorize("hasRole('USER')")
+  ResponseEntity<Object> getFundingData(@PathVariable String userId) {
+    logger.info("Get Funding Data by  user Id, userId: {}", userId);
+    return learnBridgeService.getFundingData(userId);
+  }
+
+  @GetMapping("job-market/{userId}")
+  @PreAuthorize("hasRole('USER')")
+  ResponseEntity<Object> getJobMarket(@PathVariable String userId) {
+    logger.info("Get Job Market Data by  user Id, userId: {}", userId);
+    return learnBridgeService.getJobMarket(userId);
+  }
+
 }

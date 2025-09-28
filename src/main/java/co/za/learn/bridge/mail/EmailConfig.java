@@ -1,11 +1,10 @@
 package co.za.learn.bridge.mail;
 
-import java.util.Optional;
-import java.util.Properties;
-
 import co.za.learn.bridge.model.entity.lookups.AppConfig;
 import co.za.learn.bridge.repository.AppConfigRepository;
 import co.za.learn.bridge.utils.ConstantUtil;
+import java.util.Optional;
+import java.util.Properties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

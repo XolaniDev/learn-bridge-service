@@ -1,9 +1,8 @@
 package co.za.learn.bridge.service;
 
-import java.util.Date;
-
 import co.za.learn.bridge.model.entity.EmailLog;
 import co.za.learn.bridge.repository.EmailLogRepository;
+import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -32,6 +32,7 @@ public class UserDetailsImpl implements UserDetails {
   private String financialBackground;
   private final Collection<? extends GrantedAuthority> authorities;
   @JsonIgnore private String password;
+  private boolean changePassword;
 
   public static UserDetailsImpl build(User user) {
     List<GrantedAuthority> authorities =
@@ -53,6 +54,7 @@ public class UserDetailsImpl implements UserDetails {
         .email(user.getEmail())
         .password(user.getPassword())
         .authorities(authorities)
+        .changePassword(user.isChangePassword())
         .build();
   }
 

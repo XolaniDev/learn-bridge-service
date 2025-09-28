@@ -1,10 +1,9 @@
 package co.za.learn.bridge.service;
 
-import java.util.Date;
-import java.util.List;
-
 import co.za.learn.bridge.model.entity.EmailContent;
 import co.za.learn.bridge.repository.EmailContentRepository;
+import java.util.Date;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
