@@ -346,13 +346,16 @@ public class LearnBridgeServiceImpl implements LearnBridgeService {
               new FundingDto("Allan Gray Orbis Foundation", "Private", "Full Coverage"));
 
       return ResponseEntity.ok(
-          new DashboardResponse(
-              user.getSubjects().size(),
-              user.getInterests().size(),
-              courses.size(),
-              courses,
-              jobs,
-              fundings));
+              new DashboardResponse(
+                      Optional.ofNullable(user.getSubjects()).map(List::size).orElse(0),
+                      Optional.ofNullable(user.getInterests()).map(List::size).orElse(0),
+                      Optional.of(courses).map(List::size).orElse(0),
+                      Optional.of(courses).orElseGet(Collections::emptyList),
+                      Optional.of(jobs).orElseGet(Collections::emptyList),
+                      Optional.of(fundings).orElseGet(Collections::emptyList)
+              )
+      );
+
 
     } else {
       logger.info("Invalid user ID: {}", userId);

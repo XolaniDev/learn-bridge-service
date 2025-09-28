@@ -77,6 +77,7 @@ public class AuthControllerServiceImpl implements AuthControllerService {
               .interests(userDetails.getInterests())
               .subjects(userDetails.getSubjects())
               .changePassword(userDetails.isChangePassword())
+              .learnerNumber(userDetails.getLearnerNumber())
               .financialBackground(userDetails.getFinancialBackground())
               .build();
 
