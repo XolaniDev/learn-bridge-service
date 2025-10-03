@@ -87,6 +87,7 @@ public class LearnBridgeServiceImpl implements LearnBridgeService {
 
         if (isPasswordValidation) {
           user.setPassword(encoder.encode(request.getNewPassword()));
+          user.setChangePassword(false);
           userRepository.save(user);
           asyncService.notifyUserPasswordChange(user,request.getNewPassword());
           return ResponseEntity.ok(new MessageResponse(true, "Password updated successfully"));
