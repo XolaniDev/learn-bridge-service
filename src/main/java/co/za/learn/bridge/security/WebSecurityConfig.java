@@ -64,7 +64,7 @@ public class WebSecurityConfig {
                     .permitAll()
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
                     .permitAll()
-                    .requestMatchers("/api/test/**")
+                    .requestMatchers("/api/funding-crawler/**")
                     .permitAll()
                     .requestMatchers("/error")
                     .permitAll()

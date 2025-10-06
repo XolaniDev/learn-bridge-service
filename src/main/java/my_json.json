@@ -1,0 +1,59 @@
+{
+  "subjects": 8,
+  "interests": 7,
+  "matches": 1,
+  "recommendedCourses": [
+    {
+      "id": "AI",
+      "name": "AI Suggested Courses",
+      "description": "Here are some recommended university or college courses in South Africa based on the student's details:\n\n### 1. Bachelor of Science in Information Technology\n- **Description:** This program focuses on the principles of computing and technology, allowing students to gain practical skills in software development, systems analysis, and IT project management.\n- **Required Subjects:** Mathematics, Physical Sciences\n- **Institution:** University of Cape Town (UCT)\n- **Duration:** 3 years\n- **Qualification Type:** Undergraduate Degree\n\n### 2. Bachelor of Business Administration (BBA)\n- **Description:** This course prepares students for a career in business management, covering essential topics such as marketing, finance, human resources, and entrepreneurship.\n- **Required Subjects:** Accounting, Business Studies, Economics\n- **Institution:** University of Johannesburg (UJ)\n- **Duration:** 3 years\n- **Qualification Type:** Undergraduate Degree\n\n### 3. Diploma in Sports Management\n- **Description:** This diploma offers students the chance to explore various aspects of sports management, including marketing, event management, and sports law, preparing them for careers in the sports industry.\n- **Required Subjects:** Life Sciences, Business Studies\n- **Institution:** Cape Peninsula University of Technology (CPUT)\n- **Duration:** 3 years\n- **Qualification Type:** Diploma\n\n### 4. Bachelor of Arts in Design (Visual Communication)\n- **Description:** This program focuses on the creative aspects of design, teaching students about graphic design, multimedia, and communication strategies in various industries.\n- **Required Subjects:** Arts & Design\n- **Institution:** Durban University of Technology (DUT)\n- **Duration:** 3 years\n- **Qualification Type:** Undergraduate Degree\n\n### 5. Bachelor of Medicine and Bachelor of Surgery (MBChB)\n- **Description:** This degree is aimed at students interested in pursuing a career in medicine, providing a comprehensive education in medical sciences, clinical skills, and patient care.\n- **Required Subjects:** Life Sciences, Physical Sciences, Mathematics (preferably)\n- **Institution:** University of the Witwatersrand (Wits)\n- **Duration:** 6 years\n- **Qualification Type:** Undergraduate Degree\n\nThese courses align with the student's interests in technology, science, business, arts, health, and sports, providing a diverse range of options for future studies.",
+      "requiredSubjects": [
+        "Mathematics",
+        "Mathematical Literacy",
+        "Physical Sciences",
+        "Life Sciences",
+        "Agricultural Sciences",
+        "Accounting",
+        "Business Studies",
+        "Economics"
+      ],
+      "university": "AI Engine",
+      "duration": "Varies",
+      "qualification": "Suggested Path"
+    }
+  ],
+  "jobTrends": [
+    {
+      "title": "Software Developer",
+      "demand": "High",
+      "salary": "R35,000 - R85,000"
+    },
+    {
+      "title": "Data Scientist",
+      "demand": "Very High",
+      "salary": "R40,000 - R100,000"
+    },
+    {
+      "title": "Digital Marketing Specialist",
+      "demand": "High",
+      "salary": "R25,000 - R55,000"
+    }
+  ],
+  "fundingOpportunities": [
+    {
+      "name": "NSFAS Bursary",
+      "type": "Government",
+      "amount": "Full Coverage"
+    },
+    {
+      "name": "Sasol Bursary",
+      "type": "Corporate",
+      "amount": "R80,000/year"
+    },
+    {
+      "name": "Allan Gray Orbis Foundation",
+      "type": "Private",
+      "amount": "Full Coverage"
+    }
+  ]
+}

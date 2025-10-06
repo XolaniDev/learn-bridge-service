@@ -1,5 +1,6 @@
 package co.za.learn.bridge.service;
 
+import co.za.learn.bridge.model.entity.Recommendations;
 import co.za.learn.bridge.model.entity.User;
 import co.za.learn.bridge.model.payload.request.LoginRequest;
 import co.za.learn.bridge.model.payload.request.UpdateLoginDetailsRequest;
@@ -26,6 +27,7 @@ public class LearnBridgeServiceImpl implements LearnBridgeService {
   private final PasswordEncoder encoder;
   private final AuthControllerService authControllerService;
   private final AsyncService asyncService;
+  private final RecommendationsService recommendationsService;
 
   @Override
   public ResponseEntity<Object> updateUser(UpdateUserRequest request) {
@@ -61,6 +63,7 @@ public class LearnBridgeServiceImpl implements LearnBridgeService {
       user.setSubjects(request.getSubjects());
       user.setFinancialBackground(request.getFinancialBackground());
       userRepository.save(user);
+      recommendationsService.generateRecommendations(user.getId());
       logger.info("User update successful");
       return ResponseEntity.ok(LearnBridgeUtil.getUserInfoResponse(user));
     } else {
@@ -89,7 +92,7 @@ public class LearnBridgeServiceImpl implements LearnBridgeService {
           user.setPassword(encoder.encode(request.getNewPassword()));
           user.setChangePassword(false);
           userRepository.save(user);
-          asyncService.notifyUserPasswordChange(user,request.getNewPassword());
+          asyncService.notifyUserPasswordChange(user, request.getNewPassword());
           return ResponseEntity.ok(new MessageResponse(true, "Password updated successfully"));
         } else {
           logger.info("Invalid password, please provide a strong password");
@@ -306,57 +309,17 @@ public class LearnBridgeServiceImpl implements LearnBridgeService {
     if (optionalUser.isPresent()) {
       user = optionalUser.get();
 
-      // TODO Mock data for now, replace with RecommendationService later
-      List<CourseDto> courses =
-          List.of(
-              new CourseDto(
-                  "1",
-                  "Computer Science",
-                  "Learn programming, algorithms, and software development",
-                  List.of("Mathematics", "Physical Sciences"),
-                  "University of the Witwatersrand",
-                  "4 years",
-                  "Bachelor of Science"),
-              new CourseDto(
-                  "2",
-                  "Mechanical Engineering",
-                  "Design and build mechanical systems",
-                  List.of("Mathematics", "Physical Sciences", "Engineering Graphics and Design"),
-                  "University of Cape Town",
-                  "4 years",
-                  "Bachelor of Engineering"),
-              new CourseDto(
-                  "3",
-                  "Business Administration",
-                  "Learn business management and entrepreneurship",
-                  List.of("Mathematics", "Business Studies", "Accounting"),
-                  "Stellenbosch University",
-                  "3 years",
-                  "Bachelor of Commerce"));
-
-      List<JobTrendDto> jobs =
-          List.of(
-              new JobTrendDto("Software Developer", "High", "R35,000 - R85,000"),
-              new JobTrendDto("Data Scientist", "Very High", "R40,000 - R100,000"),
-              new JobTrendDto("Digital Marketing Specialist", "High", "R25,000 - R55,000"));
-
-      List<FundingDto> fundings =
-          List.of(
-              new FundingDto("NSFAS Bursary", "Government", "Full Coverage"),
-              new FundingDto("Sasol Bursary", "Corporate", "R80,000/year"),
-              new FundingDto("Allan Gray Orbis Foundation", "Private", "Full Coverage"));
+      Recommendations recommendation = recommendationsService.getUserRecommendations(userId);
 
       return ResponseEntity.ok(
-              new DashboardResponse(
-                      Optional.ofNullable(user.getSubjects()).map(List::size).orElse(0),
-                      Optional.ofNullable(user.getInterests()).map(List::size).orElse(0),
-                      Optional.of(courses).map(List::size).orElse(0),
-                      Optional.of(courses).orElseGet(Collections::emptyList),
-                      Optional.of(jobs).orElseGet(Collections::emptyList),
-                      Optional.of(fundings).orElseGet(Collections::emptyList)
-              )
-      );
-
+          new DashboardResponse(
+              Optional.ofNullable(user.getSubjects()).map(List::size).orElse(0),
+              Optional.ofNullable(user.getInterests()).map(List::size).orElse(0),
+              Optional.of(recommendation.getRecommendedCourses()).map(List::size).orElse(0),
+              Optional.of(recommendation.getRecommendedCourses()).orElseGet(Collections::emptyList),
+              Optional.of(recommendation.getJobTrends()).orElseGet(Collections::emptyList),
+              Optional.of(recommendation.getFundingOpportunities())
+                  .orElseGet(Collections::emptyList)));
 
     } else {
       logger.info("Invalid user ID: {}", userId);
