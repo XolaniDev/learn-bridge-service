@@ -2,7 +2,8 @@ package co.za.learn.bridge.model.entity;
 
 import co.za.learn.bridge.model.payload.response.CourseDto;
 import co.za.learn.bridge.model.payload.response.FundingDto;
-import co.za.learn.bridge.model.payload.response.JobTrendDto;
+import co.za.learn.bridge.model.payload.response.JobDto;
+import co.za.learn.bridge.model.payload.response.JobMarketResponse;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,8 +24,10 @@ public class Recommendations {
     @NotBlank
     private String userId;
     private List<CourseDto> recommendedCourses;
-    private List<JobTrendDto> jobTrends;
+    private List<JobDto> jobTrends;
+    private JobMarketResponse jobMarket;
     private List<FundingDto> fundingOpportunities;
+    private List<String> careerGrowthTips;
     @NotBlank
     private Date createdDate;
 

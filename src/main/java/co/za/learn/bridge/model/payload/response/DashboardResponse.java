@@ -8,11 +8,11 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class DashboardResponse {
-    private  int subjects;
-    private  int interests;
-    private  int matches;
-    private List<CourseDto> recommendedCourses;
-    private List<JobTrendDto> jobTrends;
-    private List<FundingDto> fundingOpportunities;
-
+  private int subjects;
+  private int interests;
+  private int matches;
+  private List<CourseDto> recommendedCourses;
+  private List<JobDto> jobTrends;
+  private List<FundingDto> fundingOpportunities;
+  private List<String> careerGrowthTips;
 }

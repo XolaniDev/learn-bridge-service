@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RecommendationDto {
     private List<CourseDto> recommendedCourses;
-    private List<JobTrendDto> jobTrends;
+    private List<JobDto> jobTrends;
 }

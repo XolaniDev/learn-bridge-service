@@ -1,7 +1,9 @@
 package co.za.learn.bridge.schedule;
 
 import co.za.learn.bridge.mail.EmailSender;
+import co.za.learn.bridge.service.FundingCrawlerService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +12,9 @@ import org.springframework.stereotype.Component;
 public class ScheduledTasks {
 
   private final EmailSender mailSender;
+
+    @Autowired
+    private FundingCrawlerService crawlerService;
 
 
   /**
@@ -24,5 +29,13 @@ public class ScheduledTasks {
   public void scheduleTaskWithFixedDelay() {
     mailSender.sendEmailContent();
   }
+
+
+    // Runs every day at 00:00 (midnight)
+    @Scheduled(cron = "0 0 0 * * *")
+    public void crawlAndRefreshData() {
+        System.out.println("Daily task running at midnight -- Crawl And Refresh Data");
+        crawlerService.crawlAndRefreshData();
+    }
   
 }
