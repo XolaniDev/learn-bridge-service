@@ -2,11 +2,9 @@ package co.za.learn.bridge.service;
 
 import co.za.learn.bridge.model.entity.Recommendations;
 import co.za.learn.bridge.model.entity.User;
-import co.za.learn.bridge.model.payload.request.LoginRequest;
-import co.za.learn.bridge.model.payload.request.UpdateLoginDetailsRequest;
-import co.za.learn.bridge.model.payload.request.UpdateProfileSetupRequest;
-import co.za.learn.bridge.model.payload.request.UpdateUserRequest;
+import co.za.learn.bridge.model.payload.request.*;
 import co.za.learn.bridge.model.payload.response.*;
+import co.za.learn.bridge.repository.RecommendationsRepository;
 import co.za.learn.bridge.repository.UserRepository;
 import co.za.learn.bridge.utils.LearnBridgeUtil;
 import co.za.learn.bridge.utils.ValidationUtil;
@@ -28,6 +26,7 @@ public class LearnBridgeServiceImpl implements LearnBridgeService {
   private final AuthControllerService authControllerService;
   private final AsyncService asyncService;
   private final OpenAiService openAiService;
+  private final RecommendationsRepository recommendationsRepository;
 
   @Override
   public ResponseEntity<Object> updateUser(UpdateUserRequest request) {
@@ -175,7 +174,75 @@ public class LearnBridgeServiceImpl implements LearnBridgeService {
   @Override
   public ResponseEntity<Object> getJobMarket(String userId) {
     Recommendations recommendation = openAiService.getUserRecommendations(userId);
+    JobMarketResponse marketResponse = recommendation.getJobMarket();
+    marketResponse.setCareerGrowthTips(recommendation.getCareerGrowthTips());
     return ResponseEntity.ok(recommendation.getJobMarket());
+  }
+
+    @Override
+    public ResponseEntity<Object> getLikedJobs(String userId) {
+        // Fetch the user's recommendations
+        Recommendations recommendation = openAiService.getUserRecommendations(userId);
+        if (recommendation == null || recommendation.getJobMarket() == null) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse(false, "No job market data found for user: " + userId));
+        }
+
+        JobMarketResponse marketResponse = recommendation.getJobMarket();
+
+
+        // Collect all liked jobs across all categories
+        List<JobDto> likedJobs = new ArrayList<>();
+
+        if (marketResponse.getJobsByCategory() != null) {
+            marketResponse.getJobsByCategory().values().forEach(jobList -> jobList.stream()
+                    .filter(JobDto::isLiked)
+                    .forEach(likedJobs::add));
+        }
+
+        // Otherwise, return the list of liked jobs
+        return ResponseEntity.ok(new LikedJobsResponse(likedJobs));
+    }
+
+
+    @Override
+  public ResponseEntity<Object> likeJob(LikeJobRequest request) {
+    // Fetch the user's recommendations
+    Recommendations recommendation = openAiService.getUserRecommendations(request.getUserId());
+    if (recommendation == null || recommendation.getJobMarket() == null) {
+      return ResponseEntity.badRequest()
+          .body(
+              new MessageResponse(
+                  false, "No job market data found for user: " + request.getUserId()));
+    }
+
+    String jobId = request.getJobId();
+    JobMarketResponse marketResponse = recommendation.getJobMarket();
+
+    boolean jobFound = false;
+
+    // Iterate through all job categories and their job lists
+    if (marketResponse.getJobsByCategory() != null) {
+      for (List<JobDto> jobList : marketResponse.getJobsByCategory().values()) {
+        for (JobDto job : jobList) {
+          if (job.getId().equals(jobId)) {
+            job.setLiked(true);
+            jobFound = true;
+            break;
+          }
+        }
+        if (jobFound) break;
+      }
+    }
+
+    if (!jobFound) {
+      return ResponseEntity.badRequest()
+          .body(new MessageResponse(false, "Job with ID " + jobId + " not found."));
+    }
+
+    recommendationsRepository.save(recommendation);
+
+    return ResponseEntity.ok(marketResponse);
   }
 
   private User getUser(UpdateUserRequest request) throws LearnBridgeException {

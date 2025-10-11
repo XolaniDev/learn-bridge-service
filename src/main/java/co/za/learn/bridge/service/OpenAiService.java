@@ -103,6 +103,18 @@ public class OpenAiService {
       RecommendationDto recommendationDto = getRecommendations(grade, subjects, interests);
 
       JobMarketResponse jobMarketData = getJobMarketData(recommendationDto.getRecommendedCourses());
+
+        if (jobMarketData != null && jobMarketData.getJobsByCategory() != null) {
+            jobMarketData.getJobsByCategory().forEach((category, jobList) -> {
+                if (jobList != null) {
+                    jobList.forEach(job -> {
+                        job.setId(UUID.randomUUID().toString());
+                        job.setLiked(false);
+                    });
+                }
+            });
+        }
+
       Recommendations recommendations =
           Recommendations.builder()
               .userId(userId)

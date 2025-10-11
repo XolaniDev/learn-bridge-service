@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class JobDto {
+    private String id;
     private String title;
     private String industry;
     private String demand;
@@ -19,4 +20,5 @@ public class JobDto {
     private List<String> companies;
     private String education;
     private List<String> hotspots;
+    private boolean isLiked;
 }

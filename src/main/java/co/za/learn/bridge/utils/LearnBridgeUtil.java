@@ -15,12 +15,17 @@ public class LearnBridgeUtil {
   static Random random = new Random();
 
   public static String generatePassword() {
-    String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    int length = 10;
+    String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    String lower = "abcdefghijklmnopqrstuvwxyz";
+    String digits = "0123456789";
+    String allChars = upper + lower + digits;
+    int length = 6;
+
     StringBuilder password = new StringBuilder(length);
-    for (int i = 0; i < length; i++) {
-      int index = random.nextInt(chars.length());
-      password.append(chars.charAt(index));
+    password.append(upper.charAt(random.nextInt(upper.length())));
+    password.append(digits.charAt(random.nextInt(digits.length())));
+    for (int i = 2; i < length; i++) {
+      password.append(allChars.charAt(random.nextInt(allChars.length())));
     }
 
     return password.toString();

@@ -1,5 +1,6 @@
 package co.za.learn.bridge.controller;
 
+import co.za.learn.bridge.model.payload.request.LikeJobRequest;
 import co.za.learn.bridge.model.payload.request.UpdateLoginDetailsRequest;
 import co.za.learn.bridge.model.payload.request.UpdateProfileSetupRequest;
 import co.za.learn.bridge.model.payload.request.UpdateUserRequest;
@@ -67,5 +68,17 @@ public class LearnBridgeController {
     logger.info("Get Job Market Data by  user Id, userId: {}", userId);
     return learnBridgeService.getJobMarket(userId);
   }
+
+    @PostMapping("/like-job")
+    @PreAuthorize("hasRole('USER')")
+    ResponseEntity<Object> likeJob(@Valid @RequestBody LikeJobRequest request) {
+        return learnBridgeService.likeJob(request);
+    }
+
+    @GetMapping("liked-job/{userId}")
+    @PreAuthorize("hasRole('USER')")
+    ResponseEntity<Object> getLikedJobs(@PathVariable String userId) {
+        return learnBridgeService.getLikedJobs(userId);
+    }
 
 }

@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class JobMarketResponse {
-    private Map<String, List<JobDto>> jobsByCategory;
-    private MarketInsightsDto marketInsights;
-    private List<String> careerGrowthTips;
+public class LikedJobsResponse {
+    private List<JobDto> likedJobList;
 }
