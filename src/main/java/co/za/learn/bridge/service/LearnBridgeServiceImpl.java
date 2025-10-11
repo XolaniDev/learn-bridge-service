@@ -179,33 +179,32 @@ public class LearnBridgeServiceImpl implements LearnBridgeService {
     return ResponseEntity.ok(recommendation.getJobMarket());
   }
 
-    @Override
-    public ResponseEntity<Object> getLikedJobs(String userId) {
-        // Fetch the user's recommendations
-        Recommendations recommendation = openAiService.getUserRecommendations(userId);
-        if (recommendation == null || recommendation.getJobMarket() == null) {
-            return ResponseEntity.badRequest()
-                    .body(new MessageResponse(false, "No job market data found for user: " + userId));
-        }
-
-        JobMarketResponse marketResponse = recommendation.getJobMarket();
-
-
-        // Collect all liked jobs across all categories
-        List<JobDto> likedJobs = new ArrayList<>();
-
-        if (marketResponse.getJobsByCategory() != null) {
-            marketResponse.getJobsByCategory().values().forEach(jobList -> jobList.stream()
-                    .filter(JobDto::isLiked)
-                    .forEach(likedJobs::add));
-        }
-
-        // Otherwise, return the list of liked jobs
-        return ResponseEntity.ok(new LikedJobsResponse(likedJobs));
+  @Override
+  public ResponseEntity<Object> getLikedJobs(String userId) {
+    // Fetch the user's recommendations
+    Recommendations recommendation = openAiService.getUserRecommendations(userId);
+    if (recommendation == null || recommendation.getJobMarket() == null) {
+      return ResponseEntity.badRequest()
+          .body(new MessageResponse(false, "No job market data found for user: " + userId));
     }
 
+    JobMarketResponse marketResponse = recommendation.getJobMarket();
 
-    @Override
+    // Collect all liked jobs across all categories
+    List<JobDto> likedJobs = new ArrayList<>();
+
+    if (marketResponse.getJobsByCategory() != null) {
+      marketResponse
+          .getJobsByCategory()
+          .values()
+          .forEach(jobList -> jobList.stream().filter(JobDto::isLiked).forEach(likedJobs::add));
+    }
+
+    // Otherwise, return the list of liked jobs
+    return ResponseEntity.ok(new LikedJobsResponse(likedJobs));
+  }
+
+  @Override
   public ResponseEntity<Object> likeJob(LikeJobRequest request) {
     // Fetch the user's recommendations
     Recommendations recommendation = openAiService.getUserRecommendations(request.getUserId());
@@ -226,7 +225,11 @@ public class LearnBridgeServiceImpl implements LearnBridgeService {
       for (List<JobDto> jobList : marketResponse.getJobsByCategory().values()) {
         for (JobDto job : jobList) {
           if (job.getId().equals(jobId)) {
-            job.setLiked(true);
+            if (job.isLiked()) {
+              job.setLiked(false);
+            } else {
+              job.setLiked(true);
+            }
             jobFound = true;
             break;
           }
