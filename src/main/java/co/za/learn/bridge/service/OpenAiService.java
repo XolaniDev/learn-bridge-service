@@ -41,28 +41,35 @@ public class OpenAiService {
     String prompt =
         String.format(
             """
-       You are an AI assistant that helps South African high school learners explore study and career options.
-       Based on the following student details, suggest 3–5 university or college courses in South Africa.
+      You are an AI assistant that helps South African high school learners explore study and career options.
+      Based on the following student details, suggest 3–5 suitable courses offered at any of the following types of South African higher education institutions:
+      - Traditional Universities (academic and research-focused)
+      - Universities of Technology (practical and career-oriented)
+      - Comprehensive Universities (combine academic and technical learning)
+      - TVET Colleges (vocational and trade-focused)
+      - Private Higher Education Institutions (specialized or flexible programs)
+      - Community Education and Training (CET) Colleges (adult and continuing education)
 
-        Student Details:
-        - Grade: %s
-        - Subjects: %s
-        - Interests: %s
+      Student Details:
+      - Grade: %s
+      - Subjects: %s
+      - Interests: %s
 
-        Return ONLY valid JSON (no markdown, no explanations) in the format:
-        {
-          "recommendedCourses": [
-            {
-              "id": "1",
-              "name": "Course Name",
-              "description": "Short course description",
-              "requiredSubjects": ["Subject1", "Subject2"],
-              "university": "University Name",
-              "duration": "e.g. 3 years",
-              "qualification": "Qualification Type"
-            }
-          ]
-        }
+      Return ONLY valid JSON (no markdown, no explanations) in the format:
+      {
+        "recommendedCourses": [
+          {
+            "id": "1",
+            "name": "Course Name",
+            "description": "Short course description",
+            "requiredSubjects": ["Subject1", "Subject2"],
+            "university": "Institution Name",
+            "duration": "e.g. 3 years",
+            "qualification": "Qualification Type"
+          }
+        ]
+      }
+
         """,
             grade, String.join(", ", subjects), String.join(", ", interests));
 
@@ -104,16 +111,20 @@ public class OpenAiService {
 
       JobMarketResponse jobMarketData = getJobMarketData(recommendationDto.getRecommendedCourses());
 
-        if (jobMarketData != null && jobMarketData.getJobsByCategory() != null) {
-            jobMarketData.getJobsByCategory().forEach((category, jobList) -> {
-                if (jobList != null) {
-                    jobList.forEach(job -> {
-                        job.setId(UUID.randomUUID().toString());
-                        job.setLiked(false);
-                    });
-                }
-            });
-        }
+      if (jobMarketData != null && jobMarketData.getJobsByCategory() != null) {
+        jobMarketData
+            .getJobsByCategory()
+            .forEach(
+                (category, jobList) -> {
+                  if (jobList != null) {
+                    jobList.forEach(
+                        job -> {
+                          job.setId(UUID.randomUUID().toString());
+                          job.setLiked(false);
+                        });
+                  }
+                });
+      }
 
       Recommendations recommendations =
           Recommendations.builder()
@@ -512,7 +523,7 @@ public class OpenAiService {
                   UserFundings uf = new UserFundings();
                   try {
                     BeanUtils.copyProperties(
-                            fd,uf ); // copy fields from FundingDetails -> UserFundings
+                        fd, uf); // copy fields from FundingDetails -> UserFundings
                   } catch (Exception e) {
                     e.printStackTrace();
                   }
